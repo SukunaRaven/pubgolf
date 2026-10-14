@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Trophy, Beer, ShieldAlert, BookOpen, Users, Plus, Minus, CheckCircle, Sparkles, ChevronLeft, ChevronRight, UserCheck, RefreshCw } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Trophy, Beer, ShieldAlert, BookOpen, Users, Plus, Minus, CheckCircle, ChevronLeft, ChevronRight, UserCheck, RefreshCw, PartyPopper } from 'lucide-react';
 import { db } from './firebase';
 import { ref, onValue, set } from 'firebase/database';
 
@@ -48,7 +48,6 @@ export default function App() {
   const [scores, setScores] = useState({});
   const [penalties, setPenalties] = useState({});
 
-  // 1. Luister LIVE naar Firebase wijzigingen van alle telefoons
   useEffect(() => {
     const scoresRef = ref(db, 'pubgolf/scores');
     const penaltiesRef = ref(db, 'pubgolf/penalties');
@@ -71,14 +70,12 @@ export default function App() {
     };
   }, []);
 
-  // 2. Schrijf de invoer van jouw eigen team direct weg naar Firebase
   const handleScoreChange = (teamId, barId, delta) => {
     const key = `${teamId}-${barId}`;
     const bar = BARS.find(b => b.id === barId);
     const current = scores[key] !== undefined ? scores[key] : bar.par;
     const nextVal = Math.max(0, current + delta);
 
-    // Update in Firebase -> synced met alle telefoons
     set(ref(db, `pubgolf/scores/${key}`), nextVal);
   };
 
@@ -124,30 +121,32 @@ export default function App() {
   const myTeam = TEAMS.find(t => t.id === selectedTeamId);
   const currentBar = BARS[currentHoleIndex];
 
-  // TEAM SELECTIE SCHERM
+  // SELECTION SCREEN
   if (!selectedTeamId) {
     return (
-        <div className="min-h-screen bg-slate-950 text-white p-6 flex flex-col justify-center items-center font-sans">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 p-6 flex flex-col justify-center items-center font-sans transition-colors">
           <div className="w-full max-w-md space-y-6 text-center">
-            <div className="space-y-2">
-              <div className="inline-block p-3 bg-yellow-500/10 rounded-2xl border border-yellow-500/40 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
-                <Sparkles className="w-10 h-10 text-yellow-400 animate-pulse" />
+            <div className="space-y-3">
+              <div className="inline-flex p-3.5 bg-fuchsia-500/10 dark:bg-fuchsia-500/20 rounded-2xl border border-fuchsia-500/30 text-fuchsia-600 dark:text-fuchsia-400">
+                <PartyPopper className="w-10 h-10 animate-bounce" />
               </div>
-              <h1 className="text-3xl font-black tracking-widest uppercase text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-white to-red-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.6)]">
-                PUBGOLF 2026
+              <h1 className="text-3xl font-black tracking-tight uppercase bg-gradient-to-r from-fuchsia-600 via-purple-600 to-amber-500 dark:from-fuchsia-400 dark:via-purple-400 dark:to-amber-300 bg-clip-text text-transparent">
+                Birthday Pubgolf
               </h1>
-              <p className="text-sm text-blue-300 font-bold uppercase tracking-wider">Kies jouw team om te starten</p>
+              <p className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                Kies jouw team om te starten
+              </p>
             </div>
 
-            <div className="space-y-3 pt-4">
+            <div className="space-y-3 pt-2">
               {TEAMS.map((team) => (
                   <button
                       key={team.id}
                       onClick={() => setSelectedTeamId(team.id)}
-                      className="w-full p-4 bg-blue-950/50 hover:bg-gradient-to-r hover:from-yellow-500/20 hover:to-blue-900/60 border border-blue-900/80 hover:border-yellow-500/80 rounded-2xl flex items-center justify-between text-left transition-all active:scale-95 shadow-[0_0_10px_rgba(30,58,138,0.2)]"
+                      className="w-full p-4 bg-white dark:bg-slate-900 hover:bg-fuchsia-50 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-fuchsia-400 dark:hover:border-fuchsia-500/50 rounded-2xl flex items-center justify-between text-left transition-all active:scale-95 shadow-sm dark:shadow-none"
                   >
-                    <span className="font-extrabold text-base text-white">{team.name}</span>
-                    <UserCheck className="w-5 h-5 text-yellow-400" />
+                    <span className="font-extrabold text-base text-slate-800 dark:text-slate-100">{team.name}</span>
+                    <UserCheck className="w-5 h-5 text-fuchsia-600 dark:text-fuchsia-400" />
                   </button>
               ))}
             </div>
@@ -157,29 +156,29 @@ export default function App() {
   }
 
   return (
-      <div className="min-h-screen bg-slate-950 text-white pb-28 font-sans selection:bg-red-600 selection:text-white">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-28 font-sans transition-colors">
 
         {/* Header */}
-        <header className="bg-gradient-to-r from-blue-900 via-blue-950 to-red-950 p-4 sticky top-0 z-50 border-b border-yellow-500/40 shadow-[0_0_20px_rgba(234,179,8,0.2)]">
+        <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-4 sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 shadow-sm">
           <div className="max-w-md mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="p-1.5 bg-yellow-500/10 rounded-xl border border-yellow-500/40 shadow-[0_0_8px_rgba(234,179,8,0.5)]">
-                <Sparkles className="w-5 h-5 text-yellow-400 animate-pulse" />
+              <div className="p-2 bg-fuchsia-500/10 rounded-xl border border-fuchsia-500/20 text-fuchsia-600 dark:text-fuchsia-400">
+                <Beer className="w-5 h-5" />
               </div>
               <div>
-                <h1 className="text-lg font-black tracking-widest uppercase text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-white to-red-500">
-                  PUBGOLF
+                <h1 className="text-lg font-black tracking-tight uppercase bg-gradient-to-r from-fuchsia-600 to-purple-600 dark:from-fuchsia-400 dark:to-purple-400 bg-clip-text text-transparent">
+                  Birthday Bash
                 </h1>
-                <span className="text-[9px] tracking-widest text-blue-300 font-bold uppercase block -mt-1">Night Out • PH</span>
+                <span className="text-[10px] tracking-widest text-slate-500 dark:text-slate-400 font-bold uppercase block -mt-1">Pubgolf Edition</span>
               </div>
             </div>
 
             <button
                 onClick={() => setSelectedTeamId(null)}
-                className="flex items-center gap-1.5 bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 px-3 py-1 rounded-full text-xs font-black shadow-sm active:scale-95 transition"
+                className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-full text-xs font-bold active:scale-95 transition"
             >
               <span>{myTeam.name}</span>
-              <RefreshCw className="w-3 h-3 text-yellow-400" />
+              <RefreshCw className="w-3.5 h-3.5 text-fuchsia-500" />
             </button>
           </div>
         </header>
@@ -187,58 +186,58 @@ export default function App() {
         {/* Main Content Area */}
         <main className="max-w-md mx-auto p-4 space-y-6">
 
-          {/* TAB 1: SCORE INVOEREN (ALLEEN VOOR MIJN EIGEN TEAM) */}
+          {/* TAB 1: INVOEREN */}
           {activeTab === 'tracker' && (
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold text-blue-400 flex items-center gap-2 drop-shadow-[0_0_8px_rgba(96,165,250,0.4)]">
-                    <Beer className="w-5 h-5 text-yellow-400" /> Slokken Invoeren
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                    <Beer className="w-5 h-5 text-fuchsia-500" /> Slokken Invoeren
                   </h2>
-                  <span className="text-xs text-yellow-400 font-bold bg-yellow-500/10 border border-yellow-500/30 px-2.5 py-1 rounded-full">
+                  <span className="text-xs font-bold text-fuchsia-600 dark:text-fuchsia-400 bg-fuchsia-500/10 border border-fuchsia-500/20 px-3 py-1 rounded-full">
                 Hole {currentHoleIndex + 1} / {BARS.length}
               </span>
                 </div>
 
                 {/* Hole Card */}
-                <div className="bg-blue-950/50 backdrop-blur-md rounded-2xl p-5 border border-blue-900/80 shadow-[0_0_20px_rgba(30,58,138,0.3)] space-y-6">
-                  <div className="flex justify-between items-start border-b border-blue-900/60 pb-4">
+                <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200 dark:border-slate-800 shadow-md dark:shadow-none space-y-6">
+                  <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-4">
                     <div>
-                      <span className="text-xs font-black text-yellow-400 tracking-widest uppercase">Kroeg / Bar</span>
-                      <h3 className="text-2xl font-black text-white">{currentBar.name}</h3>
-                      <p className="text-base font-semibold text-blue-200 mt-0.5">{currentBar.drink}</p>
+                      <span className="text-xs font-black text-fuchsia-600 dark:text-fuchsia-400 tracking-widest uppercase">Kroeg / Bar</span>
+                      <h3 className="text-2xl font-black text-slate-900 dark:text-white">{currentBar.name}</h3>
+                      <p className="text-sm font-semibold text-purple-600 dark:text-purple-300 mt-0.5">{currentBar.drink}</p>
                     </div>
                     <div className="text-right">
-                  <span className="inline-block bg-blue-900 text-yellow-300 border border-yellow-500/40 px-3.5 py-1 rounded-xl text-sm font-black shadow-sm">
+                  <span className="inline-block bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 px-3 py-1 rounded-xl text-sm font-black">
                     Par {currentBar.par}
                   </span>
-                      <div className="text-xs text-slate-400 mt-1.5 font-semibold">€ {currentBar.price.toFixed(2)}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 font-semibold">€ {currentBar.price.toFixed(2)}</div>
                     </div>
                   </div>
 
-                  {/* Slokken Invoer ALLEEN VOOR JOUW TEAM */}
+                  {/* Slokken Invoer */}
                   {(() => {
                     const key = `${selectedTeamId}-${currentBar.id}`;
                     const hasEnteredScore = scores[key] !== undefined;
                     const currentSlokken = hasEnteredScore ? scores[key] : currentBar.par;
 
                     return (
-                        <div className="bg-slate-900/90 p-5 rounded-2xl border border-yellow-500/30 text-center space-y-4 shadow-inner">
-                    <span className="text-xs font-extrabold text-yellow-400 uppercase tracking-widest block">
+                        <div className="bg-slate-50 dark:bg-slate-950/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-4">
+                    <span className="text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest block">
                       Jouw Slokken ({myTeam.name})
                     </span>
 
                           <div className="flex items-center justify-center gap-6">
                             <button
                                 onClick={() => handleScoreChange(selectedTeamId, currentBar.id, -1)}
-                                className="w-14 h-14 bg-blue-900/80 hover:bg-blue-800 text-white rounded-2xl flex items-center justify-center font-black active:scale-90 transition border border-blue-700/50 shadow-lg text-xl"
+                                className="w-14 h-14 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-2xl flex items-center justify-center font-black active:scale-90 transition border border-slate-200 dark:border-slate-700 shadow-sm text-xl"
                             >
-                              <Minus className="w-7 h-7" />
+                              <Minus className="w-6 h-6" />
                             </button>
 
                             <div className="w-16 text-center">
                         <span className={`text-4xl font-black ${
-                            currentSlokken < currentBar.par ? 'text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.6)]' :
-                                currentSlokken > currentBar.par ? 'text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.6)]' : 'text-yellow-300'
+                            currentSlokken < currentBar.par ? 'text-emerald-500' :
+                                currentSlokken > currentBar.par ? 'text-rose-500' : 'text-amber-500'
                         }`}>
                           {currentSlokken}
                         </span>
@@ -247,27 +246,50 @@ export default function App() {
 
                             <button
                                 onClick={() => handleScoreChange(selectedTeamId, currentBar.id, 1)}
-                                className="w-14 h-14 bg-red-600 hover:bg-red-500 text-white rounded-2xl flex items-center justify-center font-black active:scale-90 transition shadow-[0_0_15px_rgba(220,38,38,0.5)] text-xl"
+                                className="w-14 h-14 bg-fuchsia-600 text-white rounded-2xl flex items-center justify-center font-black active:scale-90 transition shadow-md shadow-fuchsia-500/20 text-xl"
                             >
-                              <Plus className="w-7 h-7" />
+                              <Plus className="w-6 h-6" />
                             </button>
                           </div>
 
                           {!hasEnteredScore ? (
                               <button
                                   onClick={() => handleScoreChange(selectedTeamId, currentBar.id, 0)}
-                                  className="w-full py-2.5 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black rounded-xl text-xs uppercase tracking-wider transition active:scale-95 shadow-[0_0_10px_rgba(234,179,8,0.4)]"
+                                  className="w-full py-2.5 bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-black rounded-xl text-xs uppercase tracking-wider transition active:scale-95 shadow-md shadow-fuchsia-500/20"
                               >
                                 ✓ Bevestig Par ({currentBar.par} slokken)
                               </button>
                           ) : (
-                              <div className="text-xs text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/40 p-2 rounded-xl">
+                              <div className="text-xs text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 p-2 rounded-xl">
                                 ✓ Opgeslagen en live gedeeld!
                               </div>
                           )}
                         </div>
                     );
                   })()}
+
+                  {/* Strafpunten per bar */}
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                    <h4 className="text-sm font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
+                      <ShieldAlert className="w-4 h-4" /> Strafpunten bij {currentBar.name}?
+                    </h4>
+                    <div className="space-y-2">
+                      {PENALTIES.map((pen, idx) => (
+                          <div key={idx} className="bg-rose-500/5 dark:bg-rose-500/10 p-2.5 rounded-xl border border-rose-500/20 flex justify-between items-center text-xs">
+                            <div>
+                              <span className="font-semibold text-slate-700 dark:text-slate-200 block">{pen.label}</span>
+                              <span className="text-rose-500 font-bold">+{pen.points} pt</span>
+                            </div>
+                            <button
+                                onClick={() => addPenalty(selectedTeamId, pen.points)}
+                                className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-1.5 px-3 rounded-lg transition active:scale-95 shadow-sm"
+                            >
+                              + Pak Straf
+                            </button>
+                          </div>
+                      ))}
+                    </div>
+                  </div>
 
                   {/* Vorige / Volgende Knoppen */}
                   <div className="flex gap-3 pt-2">
@@ -276,8 +298,8 @@ export default function App() {
                         disabled={currentHoleIndex === 0}
                         className={`flex-1 py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 border transition ${
                             currentHoleIndex === 0
-                                ? 'bg-slate-900/40 border-slate-800 text-slate-600 cursor-not-allowed'
-                                : 'bg-blue-900/40 border-blue-700/60 text-blue-200 hover:bg-blue-900/70 active:scale-95'
+                                ? 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed'
+                                : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95'
                         }`}
                     >
                       <ChevronLeft className="w-5 h-5" /> Vorige
@@ -286,10 +308,10 @@ export default function App() {
                     <button
                         onClick={() => setCurrentHoleIndex(prev => Math.min(BARS.length - 1, prev + 1))}
                         disabled={currentHoleIndex === BARS.length - 1}
-                        className={`flex-1 py-3 px-4 rounded-xl font-extrabold flex items-center justify-center gap-2 transition shadow-lg ${
+                        className={`flex-1 py-3 px-4 rounded-xl font-extrabold flex items-center justify-center gap-2 transition shadow-md ${
                             currentHoleIndex === BARS.length - 1
-                                ? 'bg-slate-900/40 border border-slate-800 text-slate-600 cursor-not-allowed'
-                                : 'bg-gradient-to-r from-yellow-500 to-amber-600 text-slate-950 hover:from-yellow-400 hover:to-amber-500 active:scale-95 shadow-[0_0_15px_rgba(234,179,8,0.4)]'
+                                ? 'bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed'
+                                : 'bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white hover:from-fuchsia-500 hover:to-purple-500 active:scale-95 shadow-fuchsia-500/20'
                         }`}
                     >
                       Volgende <ChevronRight className="w-5 h-5" />
@@ -300,14 +322,14 @@ export default function App() {
               </div>
           )}
 
-          {/* TAB 2: LIVE LEADERBOARD VAN ALLE TEAMS */}
+          {/* TAB 2: LIVE LEADERBOARD */}
           {activeTab === 'leaderboard' && (
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold text-yellow-400 flex items-center gap-2 drop-shadow-[0_0_8px_rgba(234,179,8,0.4)]">
-                    <Trophy className="w-5 h-5 text-yellow-400" /> Live Stand (Realtime)
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-amber-500" /> Live Stand (Realtime)
                   </h2>
-                  <span className="text-xs text-blue-300">Minste punten wint!</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Minste punten wint!</span>
                 </div>
 
                 <div className="space-y-3">
@@ -317,38 +339,38 @@ export default function App() {
                     return (
                         <div
                             key={team.id}
-                            className={`p-4 rounded-xl border flex items-center justify-between transition-all backdrop-blur-md ${
+                            className={`p-4 rounded-2xl border flex items-center justify-between transition-all ${
                                 isMyTeam
-                                    ? 'bg-gradient-to-r from-yellow-500/20 to-blue-900/60 border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.4)]'
-                                    : 'bg-blue-950/40 border-blue-900/60 shadow-[0_0_10px_rgba(30,58,138,0.2)]'
+                                    ? 'bg-gradient-to-r from-fuchsia-500/10 to-purple-500/10 dark:from-fuchsia-500/20 dark:to-purple-500/20 border-fuchsia-500/50 shadow-md'
+                                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-none'
                             }`}
                         >
                           <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm shadow-md ${
-                                idx === 0 ? 'bg-yellow-400 text-slate-950 shadow-[0_0_10px_rgba(234,179,8,0.8)]' :
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm ${
+                                idx === 0 ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/30' :
                                     idx === 1 ? 'bg-slate-300 text-slate-950' :
-                                        idx === 2 ? 'bg-amber-700 text-white' : 'bg-blue-900 text-blue-200'
+                                        idx === 2 ? 'bg-amber-700 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
                             }`}>
                               {idx + 1}
                             </div>
                             <div>
-                              <h3 className="font-bold text-base text-white tracking-wide flex items-center gap-2">
+                              <h3 className="font-bold text-base text-slate-800 dark:text-slate-100 tracking-wide flex items-center gap-2">
                                 {team.name}
-                                {isMyTeam && <span className="text-[10px] bg-yellow-400 text-slate-950 px-1.5 py-0.2 rounded font-black">Jij</span>}
+                                {isMyTeam && <span className="text-[10px] bg-fuchsia-600 text-white px-1.5 py-0.2 rounded font-black">Jij</span>}
                               </h3>
-                              <div className="flex gap-2 text-xs text-slate-300 mt-0.5">
+                              <div className="flex gap-2 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                 <span>{team.holesCompleted}/9 holes</span>
                                 <span>•</span>
                                 <span>{team.totalSlokken} slokken</span>
                                 {team.penaltyPts > 0 && (
-                                    <span className="text-red-400 font-bold">({team.penaltyPts} straf)</span>
+                                    <span className="text-rose-500 font-bold">({team.penaltyPts} straf)</span>
                                 )}
                               </div>
                             </div>
                           </div>
 
                           <div className="text-right">
-                            <div className={`text-2xl font-black ${team.totalPoints <= 0 ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]' : 'text-yellow-400 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]'}`}>
+                            <div className={`text-2xl font-black ${team.totalPoints <= 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
                               {team.totalPoints > 0 ? `+${team.totalPoints}` : team.totalPoints}
                             </div>
                             <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Score</span>
@@ -363,18 +385,18 @@ export default function App() {
           {/* TAB 3: BARS ROUTE */}
           {activeTab === 'bars' && (
               <div className="space-y-4">
-                <h2 className="text-xl font-bold text-yellow-400 flex items-center gap-2 drop-shadow-[0_0_8px_rgba(234,179,8,0.4)]">
-                  <Users className="w-5 h-5 text-yellow-400" /> Bars & Route
+                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-fuchsia-500" /> Bars & Route
                 </h2>
 
-                <div className="bg-gradient-to-r from-blue-950 to-red-950 p-4 rounded-xl border border-yellow-500/40 shadow-[0_0_15px_rgba(234,179,8,0.2)] flex justify-between items-center text-sm">
+                <div className="bg-gradient-to-r from-fuchsia-600 to-purple-600 p-4 rounded-2xl text-white shadow-md shadow-fuchsia-500/20 flex justify-between items-center text-sm">
                   <div>
-                    <span className="text-blue-300">Totaal verwachte Par:</span>
-                    <p className="text-lg font-black text-yellow-300">{totalPar} Slokken</p>
+                    <span className="text-fuchsia-100">Totaal verwachte Par:</span>
+                    <p className="text-lg font-black text-amber-300">{totalPar} Slokken</p>
                   </div>
                   <div className="text-right">
-                    <span className="text-blue-300">Totale Prijs p.p.:</span>
-                    <p className="text-lg font-black text-yellow-300">€ {totalPrice.toFixed(2)}</p>
+                    <span className="text-fuchsia-100">Totale Prijs p.p.:</span>
+                    <p className="text-lg font-black text-amber-300">€ {totalPrice.toFixed(2)}</p>
                   </div>
                 </div>
 
@@ -386,17 +408,17 @@ export default function App() {
                             setCurrentHoleIndex(idx);
                             setActiveTab('tracker');
                           }}
-                          className="bg-blue-950/40 hover:bg-blue-900/40 cursor-pointer backdrop-blur-md p-4 rounded-xl border border-blue-900/60 flex justify-between items-center shadow-[0_0_10px_rgba(30,58,138,0.2)] transition"
+                          className="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex justify-between items-center shadow-sm dark:shadow-none transition"
                       >
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 text-xs px-2 py-0.5 rounded font-extrabold">Hole {bar.id}</span>
-                            <h3 className="font-bold text-white">{bar.name}</h3>
+                            <span className="bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border border-fuchsia-500/20 text-xs px-2 py-0.5 rounded-md font-extrabold">Hole {bar.id}</span>
+                            <h3 className="font-bold text-slate-800 dark:text-slate-100">{bar.name}</h3>
                           </div>
-                          <p className="text-sm text-blue-200">{bar.drink}</p>
+                          <p className="text-sm text-purple-600 dark:text-purple-300">{bar.drink}</p>
                         </div>
                         <div className="text-right">
-                          <span className="text-yellow-400 font-black block drop-shadow-[0_0_6px_rgba(234,179,8,0.5)]">Par {bar.par}</span>
+                          <span className="text-amber-500 font-black block">Par {bar.par}</span>
                           <span className="text-xs text-slate-400">€ {bar.price.toFixed(2)}</span>
                         </div>
                       </div>
@@ -405,46 +427,21 @@ export default function App() {
               </div>
           )}
 
-          {/* TAB 4: REGELS & STRAFPUNTEN */}
+          {/* TAB 4: REGELS */}
           {activeTab === 'rules' && (
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <h2 className="text-xl font-bold text-yellow-400 flex items-center gap-2 drop-shadow-[0_0_8px_rgba(234,179,8,0.4)]">
-                    <BookOpen className="w-5 h-5 text-yellow-400" /> Reglement
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-fuchsia-500" /> Reglement
                   </h2>
                   <ul className="space-y-2">
                     {RULES.map((rule, idx) => (
-                        <li key={idx} className="bg-blue-950/40 backdrop-blur-md p-3 rounded-xl border border-blue-900/60 text-sm text-blue-100 flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-yellow-400 mt-0.5 shrink-0 drop-shadow-[0_0_6px_rgba(234,179,8,0.6)]" />
+                        <li key={idx} className="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-sm text-slate-700 dark:text-slate-300 flex items-start gap-2.5 shadow-sm dark:shadow-none">
+                          <CheckCircle className="w-4 h-4 text-fuchsia-500 mt-0.5 shrink-0" />
                           <span>{rule}</span>
                         </li>
                     ))}
                   </ul>
-                </div>
-
-                <div className="space-y-3 pt-4 border-t border-blue-900/60">
-                  <h2 className="text-xl font-bold text-red-500 flex items-center gap-2 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]">
-                    <ShieldAlert className="w-5 h-5 text-red-500" /> Strafpunt Begaan?
-                  </h2>
-
-                  <p className="text-xs text-slate-400">Voeg een strafpunt toe voor jouw team ({myTeam.name}):</p>
-
-                  <div className="space-y-2">
-                    {PENALTIES.map((pen, idx) => (
-                        <div key={idx} className="bg-red-950/30 backdrop-blur-md p-3 rounded-xl border border-red-900/60 flex justify-between items-center shadow-[0_0_10px_rgba(153,27,27,0.2)]">
-                          <div>
-                            <span className="text-sm font-bold text-slate-200 block">{pen.label}</span>
-                            <span className="text-xs text-red-400 font-bold">+{pen.points} strafpunt(en)</span>
-                          </div>
-                          <button
-                              onClick={() => addPenalty(selectedTeamId, pen.points)}
-                              className="text-xs bg-red-600 hover:bg-red-500 text-white font-extrabold py-2 px-3 rounded-xl transition active:scale-95 shadow-[0_0_8px_rgba(220,38,38,0.5)]"
-                          >
-                            + Pak Straf
-                          </button>
-                        </div>
-                    ))}
-                  </div>
                 </div>
               </div>
           )}
@@ -452,12 +449,12 @@ export default function App() {
         </main>
 
         {/* Navigation Bar */}
-        <nav className="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-lg border-t border-yellow-500/30 shadow-[0_-5px_20px_rgba(0,0,0,0.8)] z-50">
+        <nav className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 z-50">
           <div className="max-w-md mx-auto flex justify-around p-2">
             <button
                 onClick={() => setActiveTab('tracker')}
                 className={`flex flex-col items-center gap-1 p-2 rounded-xl transition ${
-                    activeTab === 'tracker' ? 'text-yellow-400 font-extrabold drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]' : 'text-slate-400 hover:text-blue-300'
+                    activeTab === 'tracker' ? 'text-fuchsia-600 dark:text-fuchsia-400 font-black' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
                 }`}
             >
               <Beer className="w-5 h-5" />
@@ -467,7 +464,7 @@ export default function App() {
             <button
                 onClick={() => setActiveTab('leaderboard')}
                 className={`flex flex-col items-center gap-1 p-2 rounded-xl transition ${
-                    activeTab === 'leaderboard' ? 'text-yellow-400 font-extrabold drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]' : 'text-slate-400 hover:text-blue-300'
+                    activeTab === 'leaderboard' ? 'text-fuchsia-600 dark:text-fuchsia-400 font-black' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
                 }`}
             >
               <Trophy className="w-5 h-5" />
@@ -477,7 +474,7 @@ export default function App() {
             <button
                 onClick={() => setActiveTab('bars')}
                 className={`flex flex-col items-center gap-1 p-2 rounded-xl transition ${
-                    activeTab === 'bars' ? 'text-yellow-400 font-extrabold drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]' : 'text-slate-400 hover:text-blue-300'
+                    activeTab === 'bars' ? 'text-fuchsia-600 dark:text-fuchsia-400 font-black' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
                 }`}
             >
               <Users className="w-5 h-5" />
@@ -487,7 +484,7 @@ export default function App() {
             <button
                 onClick={() => setActiveTab('rules')}
                 className={`flex flex-col items-center gap-1 p-2 rounded-xl transition ${
-                    activeTab === 'rules' ? 'text-yellow-400 font-extrabold drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]' : 'text-slate-400 hover:text-blue-300'
+                    activeTab === 'rules' ? 'text-fuchsia-600 dark:text-fuchsia-400 font-black' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
                 }`}
             >
               <BookOpen className="w-5 h-5" />
